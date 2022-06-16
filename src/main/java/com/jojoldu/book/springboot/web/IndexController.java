@@ -1,24 +1,35 @@
 package com.jojoldu.book.springboot.web;
 
+import com.jojoldu.book.springboot.service.PostsService;
+import com.jojoldu.book.springboot.web.dto.PostsResponseDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @RequiredArgsConstructor
 @Controller
 public class IndexController {
-    @RequestMapping(method = RequestMethod.GET, value = "/")
-    public String index(){
-        return "index";   // 원래는 DispatcherServlet이 알아서 지정해줘야돼서 ViewResolver 설정해줘야하지만, mustacherStart 에서 알아서 해줍니다. 기본값은 src/main/resources/templates, 확장자는 .mustache가 붙음
+
+    private final PostsService postsService;
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("posts", postsService.findAllDesc());
+        return "index";
     }
 
     @GetMapping("/posts/save")
-    public String postsSave(){
+    public String postsSave() {
         return "posts-save";
     }
 
+    @GetMapping("/posts/update/{id}")
+    public String postsUpdate(@PathVariable Long id, Model model) {
+        PostsResponseDto dto = postsService.findById(id);
+        model.addAttribute("post", dto);
 
+        return "posts-update";
+    }
 }
